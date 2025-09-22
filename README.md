@@ -1,26 +1,39 @@
-# Library CLI (Java OOP)
+# Ice Cream Shop CLI (Java OOP)
 
-This project is a console app that manages publications (books and magazines) and demonstrates:
+This console app manages an ice cream shop focusing on order intake. It demonstrates core OOP and collections concepts:
 
-- Array: repository uses a fixed-capacity `Publication[]`.
-- Inheritance: abstract `Publication` with subclasses `Book` and `Magazine`.
-- Polymorphism: `summarize()` is invoked on `Publication` and runs the concrete implementation.
-- Menu with `Scanner`: input is read from the console in `Main`.
-- Abstract class: `Publication`.
-- Repository: `PublicationRepository` with create, read, search, and delete operations.
-- Exceptions: `ValidationException`, `DuplicateException`, `RepositoryFullException`, `NotFoundException`.
-- Interfaces and validations: `Identifiable`, `Summarizable`, `Validatable`, and `validate()` in the domain.
+- Array: repositories return arrays (T[]) and Order exposes `linesArray()`; arrays are used for simple copies/outputs.
+- Inheritance: abstract `MenuItem` with concrete subclasses `IceCreamCup` and `Milkshake`.
+- Polymorphism: the `summarize()` and `totalPrice()` methods are invoked via `MenuItem` and run the concrete implementation.
+- Menu with `Scanner`: interactive console menu in `Main` for customers and orders.
+- Abstract class: `MenuItem` centralizes common fields and validation.
+- Repository and ArrayList: in-memory repositories (`InMemoryCustomerRepository`, `InMemoryOrderRepository`) backed by `ArrayList`, exposed via the `Repository<T>` interface.
+- Exceptions: custom checked exceptions (`ValidationException`, `DuplicateException`, `NotFoundException`).
+- Interfaces and validations: `Identifiable`, `Summarizable`, `Validatable`, and comprehensive domain validations.
+- Dependency injection via interfaces: `Main` depends on `Repository<Customer>` and `Repository<Order>`, not on concrete classes.
+- Relationships: composition (Order -> OrderLine, IceCreamCup -> Scoop), aggregation (IceCreamCup -> Topping), association (Order -> Customer, OrderLine -> MenuItem).
 
-## Structure
+## Domain Model (key types)
 
-- `org.example.domain`: `Publication` (abstract), `Book`, `Magazine` + interfaces `Identifiable`, `Summarizable`, `Validatable`.
-- `org.example.repo`: `PublicationRepository` (fixed array, O(n) for search/removal).
-- `org.example.exceptions`: custom checked exceptions.
-- `org.example.Main`: CLI with a console menu.
+- `MenuItem` (abstract): id, name, price; validates common constraints; provides `totalPrice()`.
+  - `IceCreamCup`: has `CupSize`, a composed list of `Scoop` (each with a `Flavor`), and an aggregated list of `Topping`. `totalPrice()` adds 0.5 per topping.
+  - `Milkshake`: `Flavor` and `CupSize`.
+- `Customer`: basic info and validations.
+- `Order`: associated `Customer`, composed `OrderLine` list (each line has a `MenuItem` and a quantity), `OrderStatus` lifecycle, total calculation and validations.
+- Enums: `Flavor`, `Topping`, `CupSize`, `OrderStatus`.
 
-## Run without Maven (macOS/Linux)
+## Project Structure
 
-Requires Java 25 (or newer) available as `javac` and `java`.
+- `org.example.domain`: entities, abstract base class, enums and interfaces.
+- `org.example.repo`: `Repository<T>` interface + in-memory implementations using `ArrayList`.
+- `org.example.exceptions`: custom exceptions.
+- `org.example.Main`: CLI with menu for customers and orders.
+
+Note: Legacy library classes (`Publication`, `Book`, etc.) remain in the codebase only for reference of the original exercise and are not used by the new CLI.
+
+## How to Run (no Maven required)
+
+Requires Java 25 (or newer) available as `javac` and `java` on your PATH.
 
 ```bash
 # Compile
@@ -31,38 +44,40 @@ javac -d target/classes $(find src/main/java -name "*.java")
 java -cp target/classes org.example.Main
 ```
 
-Example interactive input:
+Example interactive session (inputs on the left):
 
 ```
-1
-B1
-El Quijote
-Cervantes
-863
-2
-M1
-National Geographic
-101
-3
-4
-B1
-5
-M1
-3
-0
-```
-
-## Run with Maven (optional)
-
-If you have Maven installed:
-
-```bash
-mvn -DskipTests package
-java -cp target/classes org.example.Main
+1        # Customers menu
+1        # Add customer
+C1
+Alice
++5491112345678
+0        # Back
+2        # Create order
+1        # Choose existing customer
+1        # Customer #1 (Alice)
+1        # Add ice cream cup
+CUP1
+Copa clásica
+2        # MEDIUM size
+2        # Scoops (1-2)
+1        # VANILLA
+2        # CHOCOLATE
+s        # add toppings?
+1        # CHOCOLATE_CHIPS
+n        # add another?
+2        # Add milkshake
+MS1
+Choco Shake
+3        # LARGE size
+2        # CHOCOLATE flavor
+1        # quantity
+0        # finish lines
+3        # List orders
+0        # Exit
 ```
 
 ## Notes
 
-- The repository uses a fixed-capacity array. You can adjust capacity in `Main` (`new PublicationRepository(100)`).
-- Validations throw `ValidationException` (empty fields, positive integers, length checks). `PublicationRepository` may also throw `DuplicateException`, `RepositoryFullException`, `NotFoundException`.
-- If you see accented characters not rendering correctly in the console, ensure the terminal uses UTF-8 (you can also run with `-Dfile.encoding=UTF-8`).
+- If accented characters appear incorrectly, ensure your terminal uses UTF-8 or run with `-Dfile.encoding=UTF-8`.
+- You can swap repositories thanks to the `Repository<T>` interface. For example, a fixed-array implementation could be added easily for teaching purposes.
