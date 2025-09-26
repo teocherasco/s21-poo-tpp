@@ -1,4 +1,5 @@
 # Ice Cream Shop CLI (Java OOP)
+Web URL: https://v0-heladeria-web-page.vercel.app/
 
 This console app manages an ice cream shop focusing on order intake. It demonstrates core OOP and collections concepts:
 
