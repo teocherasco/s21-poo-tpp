@@ -124,7 +124,7 @@ public class Main {
         Customer customer = pickOrCreateCustomer();
         if (customer == null) return;
 
-        Order order = new Order(null, customer);
+        Order order = new Order(customer);
         boolean adding = true;
         while (adding) {
             System.out.println("Agregar línea:");

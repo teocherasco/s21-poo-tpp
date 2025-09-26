@@ -19,8 +19,8 @@ public class Order implements Identifiable, Summarizable, Validatable {
     private OrderStatus status = OrderStatus.NUEVO;
     private final LocalDateTime createdAt = LocalDateTime.now();
 
-    public Order(String id, Customer customer) {
-        this.id = (id == null || id.isBlank()) ? UUID.randomUUID().toString() : id;
+    public Order(Customer customer) {
+        this.id = UUID.randomUUID().toString();
         this.customer = customer;
     }
 
