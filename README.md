@@ -82,130 +82,63 @@ Choco Shake
 - If accented characters appear incorrectly, ensure your terminal uses UTF-8 or run with `-Dfile.encoding=UTF-8`.
 - You can swap repositories thanks to the `Repository<T>` interface. For example, a fixed-array implementation could be added easily for teaching purposes.
 
-```plantuml
-@startuml
-' Interfaces
-interface Identifiable
-interface Summarizable
-interface Validatable
-
-' Excepciones
-class ValidationException
-class DuplicateException
-class NotFoundException
-
-' Enums
-enum Flavor
-enum Topping
-enum CupSize {
-  +getMaxScoops()
-}
-enum OrderStatus
-
-' Clase abstracta base
-abstract class MenuItem {
-  - id: String
-  - name: String
-  - price: double
-  + getId(): String
-  + getName(): String
-  + getPrice(): double
-  + totalPrice(): double
-  + validate(): void
-  + summarize(): String
-}
-
-' Subclases de MenuItem
-class IceCreamCup {
-  - size: CupSize
-  - scoops: List<Scoop>
-  - toppings: List<Topping>
-  + addScoop(Scoop): void
-  + addTopping(Topping): void
-  + totalPrice(): double
-  + summarize(): String
-}
-
-class Milkshake {
-  - flavor: Flavor
-  - size: CupSize
-}
-
-MenuItem <|-- IceCreamCup
-MenuItem <|-- Milkshake
-
-' Customer
-class Customer {
-  + validate(): void
-}
-
-' Scoop
-class Scoop {
-  - flavor: Flavor
-  + getFlavor(): Flavor
-  + validate(): void
-  + summarize(): String
-}
-
-' OrderLine
-class OrderLine {
-  - item: MenuItem
-  - quantity: int
-  + getItem(): MenuItem
-  + getQuantity(): int
-  + lineTotal(): double
-  + validate(): void
-  + summarize(): String
-}
-
-OrderLine "1" o-- "1" MenuItem
-
-' Order
-class Order {
-  - id: String
-  - customer: Customer
-  - lines: List<OrderLine>
-  - status: OrderStatus
-  + confirm(): void
-  + cancel(): void
-  + addLine(OrderLine): void
-  + total(): double
-  + validate(): void
-  + summarize(): String
-}
-
-Order "1" -- "1" Customer
-Order "1" *-- "0..*" OrderLine
-
-' IceCreamCup relaciones
-IceCreamCup *-- "1..*" Scoop
-IceCreamCup o-- "0..*" Topping
-
-' Repositorios
-interface Repository<T> {
-  + add(T): void
-  + findAll(): T[]
-  + findById(String): T
-  + removeById(String): void
-  + size(): int
-}
-class InMemoryOrderRepository
-class InMemoryCustomerRepository
-
-Repository <|.. InMemoryOrderRepository
-Repository <|.. InMemoryCustomerRepository
-
-' Interfaces implementadas
-MenuItem ..|> Identifiable
-MenuItem ..|> Summarizable
-MenuItem ..|> Validatable
-Order ..|> Identifiable
-Order ..|> Summarizable
-Order ..|> Validatable
-OrderLine ..|> Summarizable
-OrderLine ..|> Validatable
-Scoop ..|> Summarizable
-Scoop ..|> Validatable
-
-@enduml
+```mermaid
+classDiagram
+    class MenuItem {
+        <<abstract>>
+        -String id
+        -String name  
+        -double price
+        +getId() String
+        +getName() String
+        +getPrice() double
+        +totalPrice() double
+        +validate() void
+        +summarize() String
+    }
+    
+    class IceCreamCup {
+        -CupSize size
+        -List~Scoop~ scoops
+        -List~Topping~ toppings
+        +addScoop(Scoop) void
+        +addTopping(Topping) void
+        +totalPrice() double
+        +summarize() String
+    }
+    
+    class Milkshake {
+        -Flavor flavor
+        -CupSize size
+    }
+    
+    MenuItem <|-- IceCreamCup
+    MenuItem <|-- Milkshake
+    
+    class Order {
+        -String id
+        -Customer customer
+        -List~OrderLine~ lines
+        -OrderStatus status
+        +confirm() void
+        +cancel() void
+        +addLine(OrderLine) void
+        +total() double
+        +validate() void
+        +summarize() String
+    }
+    
+    class OrderLine {
+        -MenuItem item
+        -int quantity
+        +getItem() MenuItem
+        +getQuantity() int
+        +lineTotal() double
+        +validate() void
+        +summarize() String
+    }
+    
+    Order "1" -- "1" Customer
+    Order "1" *-- "0..*" OrderLine
+    OrderLine "1" o-- "1" MenuItem
 ```
